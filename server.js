@@ -27,8 +27,11 @@ app.post("/api/users", bodyParser.urlencoded({extended: false}) , (req, res)=>{
   })
 })
 
-app.get("/api/user", (req, res)=>{
-  
+app.get("/api/users", (req, res)=>{
+  user.find({}, (err , data)=>{
+    if (err) return console.log(err);
+    res.json(data)
+  })
 })
 
 app.post("/api/users/:_id/exercises", bodyParser.urlencoded({extended: false}) , (req, res)=>{
