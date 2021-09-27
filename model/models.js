@@ -12,11 +12,6 @@ const exerciceSchema = new Schema({
     date: String
   })
 
-let user = mongoose.model("exercice", exerciceSchema);
-
-
-exports.ExerciceModel = user
-
 const userSchema = new Schema({
     username : {type : String, required: true},
     log: [exerciceSchema]

@@ -1,7 +1,10 @@
 const express = require('express')
 const app = express()
+const bodyParser = require("body-parser");
 const cors = require('cors')
 require('dotenv').config()
+
+
 const mongoose = require('mongoose');
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -15,6 +18,22 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
+app.post("/api/users", bodyParser.urlencoded({extended: false}) , (req, res)=>{
+  let inputName = req.body["username"] 
+  let newUser = new user({username: inputName })
+  newUser.save((err,data)=>{
+    if (err) return console.log(err);
+    res.json({username : data.username , _id: data._id} )
+  })
+})
+
+app.get("/api/user", (req, res)=>{
+  
+})
+
+app.post("/api/users/:_id/exercises", bodyParser.urlencoded({extended: false}) , (req, res)=>{
+  res.json({})
+})
 
 
 
