@@ -6,8 +6,8 @@ const mongoose = require('mongoose');
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
-const user = require("./model/user.js").UserModel
-const exercice = require("./model/exercice.js").ExerciceModel
+const user = require("./model/models.js").UserModel
+const exercice = require("./model/models.js").ExerciceModel
 
 app.use(cors())
 app.use(express.static('public'))
