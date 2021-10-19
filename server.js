@@ -47,7 +47,11 @@ app.post("/api/users/:_id/exercises", bodyParser.urlencoded({extended: false}) ,
   })
   let idUser = req.params._id
   if (exerciceInfo.date === ""){
-    exerciceInfo.date = new Date().toISOString().substring(0,10)
+    exerciceInfo.date = new Date()
+  }else{
+    let date = new Date(exerciceInfo.date)
+    exerciceInfo.date = new Date( Date.parse(date) - (date.getTimezoneOffset() * 60 * 1000))
+    
   }
 
   User.findByIdAndUpdate(idUser,{$push : {log: exerciceInfo}}, {new: true}, (err, data) =>{
@@ -60,23 +64,77 @@ app.post("/api/users/:_id/exercises", bodyParser.urlencoded({extended: false}) ,
         duration: exerciceInfo.duration,
         description: exerciceInfo.description
       };
-    console.log(responseObject)
     res.json(responseObject);
   })
 })
 
 
 app.get("/api/users/:id/logs", bodyParser.urlencoded({extended: false}) , (req, res)=>{
-  User.findById(req.params.id ,"_id username log" , (err, data)=>{
+  let from =  Date.parse(req.query.from);
+  let to = Date.parse(req.query.to);
+  let limit = req.query.limit;
+  let maxloop = 0;
+
+    User.findById(req.params.id ,"_id username log" , (err, data)=>{
     if (err) return console.log(err);
-    console.log(data)
+    let responceLogObject = [];
+    if(data.log.length != 0) {
+      if (limit) {
+        maxloop = limit;
+      }else {
+        maxloop = data.log.length;
+      }
+      let limitIndex = 0;
+      for (x in data.log) {
+        let dateStr = new Date(data.log[x].date).toDateString()
+        let dateint = Date.parse(dateStr);
+        if(from && to){
+          if (to > dateint && from < dateint){
+            responceLogObject.push({
+              description: data.log[x].description,
+              duration: data.log[x].duration,
+              date: new Date(data.log[x].date).toDateString(),
+            })
+            limitIndex++
+          }
+        }else if(from == undefined && to){
+          if (to > dateint){
+            responceLogObject.push({
+              description: data.log[x].description,
+              duration: data.log[x].duration,
+              date: new Date(data.log[x].date).toDateString(),
+            })
+            limitIndex++
+          }
+        }else if(from && to == undefined){
+          if (from < dateint ){
+            responceLogObject.push({
+              description: data.log[x].description,
+              duration: data.log[x].duration,
+              date: new Date(data.log[x].date).toDateString(),
+            })
+            limitIndex++
+          }
+        }else{
+          responceLogObject.push({
+            description: data.log[x].description,
+            duration: data.log[x].duration,
+            date: new Date(data.log[x].date).toDateString(),
+          })
+          limitIndex++
+        }
+        if (limit == limitIndex){
+          break
+        }
+      }
+
+    } 
     responseObject = {
       _id: data.id,
       username: data.username,
       count: data.log.length,
-
+      log: responceLogObject
     }
-    console.log(responseObject)
     res.json(responseObject)
   })
 
