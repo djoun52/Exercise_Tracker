@@ -53,7 +53,6 @@ app.post("/api/users/:_id/exercises", bodyParser.urlencoded({extended: false}) ,
 
     
   }else{
-    console.log(exerciceInfo.date)
     exerciceInfo.date = new Date(exerciceInfo.date).toDateString()
   }
 
@@ -130,17 +129,12 @@ app.get("/api/users/:id/logs", bodyParser.urlencoded({extended: false}) , (req, 
           break
         }
       }
-
     } 
     responseObject = {
       _id: data.id,
       username: data.username,
       count: data.log.length,
       log: responceLogObject
-    }
-    for (const key in responseObject.log) {
-        console.log(responseObject.log[key].date)
-        console.log(typeof responseObject.log[key].date)
     }
     res.json(responseObject)
   })
