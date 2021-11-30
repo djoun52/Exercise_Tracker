@@ -2,14 +2,12 @@ require('dotenv').config();
 
 const mongoose = require('mongoose');
 
-
-
 const Schema = mongoose.Schema;
 
 const exerciceSchema = new Schema({
     description:  {type : String, required: true},
     duration: {type : Number, required: true},
-    date: String
+    date: { type: String, required: false }
   })
 
 const userSchema = new Schema({

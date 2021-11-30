@@ -35,6 +35,7 @@ app.get("/api/users", (req, res)=>{
 })
 app.get("/api/delete", (req, res)=>{
   User.deleteMany({}, (err, data)=>{
+    console.log("all user delete")
     res.json({done: "all user delete"})
   })
 })
@@ -46,12 +47,14 @@ app.post("/api/users/:_id/exercises", bodyParser.urlencoded({extended: false}) ,
     date: req.body.date 
   })
   let idUser = req.params._id
-  if (exerciceInfo.date === ""){
-    exerciceInfo.date = new Date()
-  }else{
-    let date = new Date(exerciceInfo.date)
-    exerciceInfo.date = new Date( Date.parse(date) - (date.getTimezoneOffset() * 60 * 1000))
+  if (exerciceInfo.date === "" || exerciceInfo.date === undefined ){
+    let date1= new Date()
+    exerciceInfo.date = new Date( Date.parse(date1) - (date1.getTimezoneOffset() * 60 * 1000)).toDateString()
+
     
+  }else{
+    console.log(exerciceInfo.date)
+    exerciceInfo.date = new Date(exerciceInfo.date).toDateString()
   }
 
   User.findByIdAndUpdate(idUser,{$push : {log: exerciceInfo}}, {new: true}, (err, data) =>{
@@ -60,7 +63,7 @@ app.post("/api/users/:_id/exercises", bodyParser.urlencoded({extended: false}) ,
     let responseObject = {
         _id: data.id, 
         username: data.username,
-        date: new Date(exerciceInfo.date).toDateString(),
+        date: exerciceInfo.date,
         duration: exerciceInfo.duration,
         description: exerciceInfo.description
       };
@@ -86,14 +89,14 @@ app.get("/api/users/:id/logs", bodyParser.urlencoded({extended: false}) , (req, 
       }
       let limitIndex = 0;
       for (x in data.log) {
-        let dateStr = new Date(data.log[x].date).toDateString()
+        let dateStr = new Date(data.log[x].date)
         let dateint = Date.parse(dateStr);
         if(from && to){
           if (to > dateint && from < dateint){
             responceLogObject.push({
               description: data.log[x].description,
               duration: data.log[x].duration,
-              date: new Date(data.log[x].date).toDateString(),
+              date: new Date(data.log[x].date).toDateString()
             })
             limitIndex++
           }
@@ -102,7 +105,7 @@ app.get("/api/users/:id/logs", bodyParser.urlencoded({extended: false}) , (req, 
             responceLogObject.push({
               description: data.log[x].description,
               duration: data.log[x].duration,
-              date: new Date(data.log[x].date).toDateString(),
+              date: new Date(data.log[x].date).toDateString()
             })
             limitIndex++
           }
@@ -111,7 +114,7 @@ app.get("/api/users/:id/logs", bodyParser.urlencoded({extended: false}) , (req, 
             responceLogObject.push({
               description: data.log[x].description,
               duration: data.log[x].duration,
-              date: new Date(data.log[x].date).toDateString(),
+              date: new Date(data.log[x].date).toDateString()
             })
             limitIndex++
           }
@@ -119,7 +122,7 @@ app.get("/api/users/:id/logs", bodyParser.urlencoded({extended: false}) , (req, 
           responceLogObject.push({
             description: data.log[x].description,
             duration: data.log[x].duration,
-            date: new Date(data.log[x].date).toDateString(),
+            date: new Date(data.log[x].date).toDateString()
           })
           limitIndex++
         }
@@ -134,6 +137,10 @@ app.get("/api/users/:id/logs", bodyParser.urlencoded({extended: false}) , (req, 
       username: data.username,
       count: data.log.length,
       log: responceLogObject
+    }
+    for (const key in responseObject.log) {
+        console.log(responseObject.log[key].date)
+        console.log(typeof responseObject.log[key].date)
     }
     res.json(responseObject)
   })
